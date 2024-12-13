@@ -1,0 +1,4 @@
+{
+  "java.compile.nullAnalysis.mode": "automatic",
+  "cmake.sourceDirectory": "/home/lacaso/aastu1/Project/bus_ticketing_app/linux"
+}
