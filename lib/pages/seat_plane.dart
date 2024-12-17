@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'payment.dart'; // Import the PaymentPage
 
 class SeatPlanPage extends StatefulWidget {
   final String busNumber;
   final String departureTime;
-  final String date;
   final String from;
   final String to;
+  final String date;
   final double price;
 
   const SeatPlanPage({super.key, 
     required this.busNumber,
     required this.departureTime,
-    required this.date,
     required this.from,
     required this.to,
+    required this.date,
     required this.price,
   });
 
@@ -23,20 +24,26 @@ class SeatPlanPage extends StatefulWidget {
 
 class _SeatPlanPageState extends State<SeatPlanPage> {
   List<String> seats = List.generate(12, (index) => 'Available');
-  List<int> selectedSeats = [];
+  ValueNotifier<List<int>> selectedSeatsNotifier = ValueNotifier<List<int>>([]);
 
   void toggleSeat(int index) {
-    if (seats[index] == 'Available') {
-      setState(() {
+    setState(() {
+      if (seats[index] == 'Available') {
         seats[index] = 'Selected';
-        selectedSeats.add(index + 1); // Store seat number
-      });
-    } else if (seats[index] == 'Selected') {
-      setState(() {
+        selectedSeatsNotifier.value = List.from(selectedSeatsNotifier.value)
+          ..add(index + 1); // Store seat number
+      } else if (seats[index] == 'Selected') {
         seats[index] = 'Available';
-        selectedSeats.remove(index + 1); // Remove seat number
-      });
-    }
+        selectedSeatsNotifier.value = List.from(selectedSeatsNotifier.value)
+          ..remove(index + 1); // Remove seat number
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    selectedSeatsNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,7 +58,10 @@ class _SeatPlanPageState extends State<SeatPlanPage> {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Board Point: ${widget.from} - ${widget.departureTime}\nDrop Point: ${widget.to} - 07:30',
+              'Bus Number: ${widget.busNumber}\n'
+              'Departure: ${widget.departureTime}\n'
+              'From: ${widget.from} - To: ${widget.to}\n'
+              'Price per seat: \$${widget.price}',
               style: const TextStyle(fontSize: 18),
             ),
           ),
@@ -59,35 +69,42 @@ class _SeatPlanPageState extends State<SeatPlanPage> {
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
+                crossAxisSpacing: 15,
+                mainAxisSpacing: 5,
               ),
-              itemCount: 12,
+              itemCount: seats.length,
               itemBuilder: (context, index) {
-                Color seatColor;
-                if (seats[index] == 'Sold Out') {
-                  seatColor = Colors.red; // Sold Out
-                } else if (seats[index] == 'Selected') {
-                  seatColor = Colors.purple; // Selected
-                } else {
-                  seatColor = Colors.blue; // Available
-                }
-
                 return GestureDetector(
-                  onTap: () {
-                    if (seats[index] != 'Sold Out') {
-                      toggleSeat(index);
-                    }
-                  },
+                  onTap: () => toggleSeat(index),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: seatColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    // decoration: BoxDecoration(
+                    //   color: seats[index] == 'Available'
+                    //       ? Colors.green
+                    //       : Colors.red,
+                    //   borderRadius: BorderRadius.circular(8),
+                    // ),
+                    // decoration: BoxDecoration(
+                    //   color: seats[index] == 'Available'
+                    //       ? Colors.green
+                    //       : Colors.red,
+                    //   borderRadius: BorderRadius.circular(8),
+                    // ),
                     child: Center(
-                      child: Text(
-                        (index + 1).toString(),
-                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.airline_seat_legroom_normal_sharp,
+                            color: seats[index] == 'Available'
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                          Text(
+                            'Seat ${index + 1}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 16),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -99,39 +116,42 @@ class _SeatPlanPageState extends State<SeatPlanPage> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Text('Selected Seats: ${selectedSeats.join(', ')}'),
-                Text('Total Price: Bir ${widget.price * selectedSeats.length}'),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle booking confirmation logic here
-                    if (selectedSeats.isNotEmpty) {
-                      // Proceed with booking
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Booking Confirmed'),
-                          content: Text(
-                              'You have booked seats: ${selectedSeats.join(', ')}'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      // Show a message if no seats are selected
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Please select at least one seat.')),
-                      );
-                    }
+                ValueListenableBuilder<List<int>>(
+                  valueListenable: selectedSeatsNotifier,
+                  builder: (context, selectedSeats, child) {
+                    return Text(
+                      'Selected Seats: ${selectedSeats.join(', ')}',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    );
                   },
-                  child: const Text('Confirm Booking'),
+                ),
+                const SizedBox(height: 20),
+                ValueListenableBuilder<List<int>>(
+                  valueListenable: selectedSeatsNotifier,
+                  builder: (context, selectedSeats, child) {
+                    return ElevatedButton(
+                      onPressed: selectedSeats.isEmpty
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PaymentPage(
+                                    busNumber: widget.busNumber,
+                                    departureTime: widget.departureTime,
+                                    from: widget.from,
+                                    to: widget.to,
+                                    date: widget.date,
+                                    price: widget.price,
+                                    selectedSeats: selectedSeats,
+                                  ),
+                                ),
+                              );
+                            },
+                      child: const Text('Confirm Booking'),
+                    );
+                  },
                 ),
               ],
             ),
@@ -141,4 +161,3 @@ class _SeatPlanPageState extends State<SeatPlanPage> {
     );
   }
 }
- 
