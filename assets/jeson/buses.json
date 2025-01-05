@@ -1,4 +1,129 @@
 {
+    "buses": [
+      {
+        "number": "BADER 8322",
+        "departureTime": "06:30 - 08:00",
+        "date": "2024-12-28",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 300.0
+      },
+      {
+        "number": "BADER 8323",
+        "departureTime": "09:00 - 11:00",
+        "date": "2024-12-13",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 320.0
+      },
+      {
+        "number": "BADER 8324",
+        "departureTime": "12:00 - 14:00",
+        "date": "2024-12-28",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 350.0
+      },
+      {
+        "number": "BADER 8325",
+        "departureTime": "15:00 - 17:00",
+        "date": "2025-01-13",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 370.0
+      },
+      {
+        "number": "BADER 8326",
+        "departureTime": "18:00 - 20:00",
+        "date": "2025-01-28",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 400.0
+      },
+      {
+        "number": "BADER 8327",
+        "departureTime": "06:30 - 08:00",
+        "date": "2024-12-28",
+        "from": "Addis Ababa",
+        "to": "Jijiga",
+        "price": 300.0
+      },
+      {
+        "number": "BADER 8328",
+        "departureTime": "09:00 - 11:00",
+        "date": "2024-12-13",
+        "from": "Addis Ababa",
+        "to": "Jijiga",
+        "price": 320.0
+      },
+      {
+        "number": "BADER 8329",
+        "departureTime": "12:00 - 14:00",
+        "date": "2024-12-28",
+        "from": "Addis Ababa",
+        "to": "Jijiga",
+        "price": 350.0
+      },
+      {
+        "number": "BADER 8330",
+        "departureTime": "15:00 - 17:00",
+        "date": "2025-01-13",
+        "from": "Addis Ababa",
+        "to": "Jijiga",
+        "price": 370.0
+      },
+      {
+        "number": "BADER 8331",
+        "departureTime": "18:00 - 20:00",
+        "date": "2025-01-28",
+        "from": "Addis Ababa",
+        "to": "Jijiga",
+        "price": 400.0
+      },
+      {
+        "number": "BADER 8332",
+        "departureTime": "06:30 - 08:00",
+        "date": "2024-11-28",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 300.0
+      },
+      {
+        "number": "BADER 8333",
+        "departureTime": "09:00 - 11:00",
+        "date": "2024-12-13",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 320.0
+      },
+      {
+        "number": "BADER 8334",
+        "departureTime": "12:00 - 14:00",
+        "date": "2024-12-28",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 350.0
+      },
+      {
+        "number": "BADER 8335",
+        "departureTime": "15:00 - 17:00",
+        "date": "2025-01-13",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 370.0
+      },
+      {
+        "number": "BADER 8336",
+        "departureTime": "18:00 - 20:00",
+        "date": "2025-01-28",
+        "from": "Jijiga",
+        "to": "Wajale",
+        "price": 400.0
+      }
+      
+      
+    ]
+  }
 	"buses": [
 
 	  {

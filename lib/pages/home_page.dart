@@ -57,7 +57,28 @@ class _HomePageState extends State<HomePage> {
     Navigator.pop(context); // Close the loading indicator
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const BusSearchPage()),
+      MaterialPageRoute(builder: (context) => BusSearchPage()),
+    );
+  }
+
+  void showThanksDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Welcome to Bus Ticketing App'),
+          content: const Text(
+              'Thanks for choosing us, we are here to help you \n\nCall us on +251 911 111 111'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 
