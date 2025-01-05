@@ -1,8 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'seat_plane.dart';
-import 'package:flutter/services.dart';
+
+// ignore: depend_on_referenced_packages
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BusListPage extends StatefulWidget {
   final String? from;
@@ -16,6 +16,7 @@ class BusListPage extends StatefulWidget {
 }
 
 class _BusListPageState extends State<BusListPage> {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
   List<Map<String, dynamic>> buses = [];
   List<Map<String, dynamic>> filteredBuses = [];
 
@@ -34,21 +35,48 @@ class _BusListPageState extends State<BusListPage> {
     super.initState();
     print(
         'From: ${widget.from}, To: ${widget.to}, Date: ${widget.date}'); // Debug print statement
-    loadBusData();
+    fetchBuses();
   }
 
-  Future<void> loadBusData() async {
+  // Future<void> loadBusData() async {
+  //   try {
+  //     final String response =
+  //         await rootBundle.loadString('assets/jeson/buses.json');
+  //     final data = await json.decode(response);
+  //     setState(() {
+  //       buses = List<Map<String, dynamic>>.from(data['buses']);
+  //       print('Fetched Buses: $buses'); // Debug print statement
+  //       filterBuses();
+  //     });
+  //   } catch (e) {
+  //     print('Error loading bus data: $e');
+  //   }
+  // }
+
+  Future<void> fetchBuses() async {
     try {
-      final String response =
-          await rootBundle.loadString('assets/jeson/buses.json');
-      final data = await json.decode(response);
+      QuerySnapshot querySnapshot = await firestore.collection('buses').get();
       setState(() {
-        buses = List<Map<String, dynamic>>.from(data['buses']);
-        print('Fetched Buses: $buses'); // Debug print statement
-        filterBuses();
+        buses = querySnapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+
+          // Ensure that reservedSeats is a List<int>
+          if (data['reservedSeats'] != null) {
+            data['reservedSeats'] = List<int>.from(data['reservedSeats']);
+          } else {
+            data['reservedSeats'] = [];
+          }
+
+          print("Fetched Bus: $data"); // Debug print
+
+          return {...data, 'id': doc.id}; // Include document ID
+        }).toList();
+        filterBuses(); // Assuming this is a function to filter the bus list
       });
     } catch (e) {
-      print('Error loading bus data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching buses: $e")),
+      );
     }
   }
 
@@ -120,19 +148,28 @@ class _BusListPageState extends State<BusListPage> {
                     itemCount: filteredBuses.length,
                     itemBuilder: (context, index) {
                       final bus = filteredBuses[index];
+
+                      // Debugging print statements
+                      print("Bus Details: $bus");
+
                       return GestureDetector(
                         onTap: () {
+                          // Assuming you're in a function that handles bus selection
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SeatPlanPage(
-                                busNumber: bus['number'],
-                                departureTime: bus['departureTime'],
-                                date: bus['date'],
-                                from: bus['from'],
-                                to: bus['to'],
-                                price: bus['price'],
-                              ),
+                            builder: (context) => SeatPlanPage(
+                              busNumber: bus['busNumber'] ?? 'Unknown',
+                              departureTime: bus['departure'] ?? 'Unknown',
+                              arrivalTime: bus['arrival'] ?? 'Unknown',
+                              date: bus['date'] ?? 'Unknown',
+                              from: bus['from'] ?? 'Unknown',
+                              to: bus['to'] ?? 'Unknown',
+                              price: bus['price']?.toDouble() ?? 0.0,
+                              seatreserved: List<int>.from(
+                                  bus['seatreseve'] ?? []), // Correctly cast
+                              busId: bus['id'] ?? 'Unknown',
+                            ),
                             ),
                           );
                         },
@@ -149,7 +186,7 @@ class _BusListPageState extends State<BusListPage> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      bus['number'],
+                                      bus['busNumber'] ?? 'No Bus Number',
                                       style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
@@ -157,7 +194,7 @@ class _BusListPageState extends State<BusListPage> {
                                       ),
                                     ),
                                     Text(
-                                      'ETB ${bus['price']}',
+                                      'ETB ${bus['price']?.toString() ?? '0'}',
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -168,7 +205,7 @@ class _BusListPageState extends State<BusListPage> {
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  bus['date'],
+                                  bus['date'] ?? 'No Date',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.white,
@@ -176,7 +213,15 @@ class _BusListPageState extends State<BusListPage> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  bus['departureTime'],
+                                  'Departure Time: ${bus['departure'] ?? 'No Time'}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Arrival Time: ${bus['arrival'] ?? 'No Time'}',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.white,
@@ -189,7 +234,7 @@ class _BusListPageState extends State<BusListPage> {
                                         color: Colors.white),
                                     const SizedBox(width: 5),
                                     Text(
-                                      'From: ${bus['from']}',
+                                      'From: ${bus['from'] ?? 'Unknown'}',
                                       style:
                                           const TextStyle(color: Colors.white),
                                     ),
@@ -201,7 +246,7 @@ class _BusListPageState extends State<BusListPage> {
                                         color: Colors.white),
                                     const SizedBox(width: 5),
                                     Text(
-                                      'To: ${bus['to']}',
+                                      'To: ${bus['to'] ?? 'Unknown'}',
                                       style:
                                           const TextStyle(color: Colors.white),
                                     ),

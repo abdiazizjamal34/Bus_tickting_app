@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 
+import 'payment.dart'; // Import the PaymentPage
+
 class SeatPlanPage extends StatefulWidget {
   final String busNumber;
   final String departureTime;
-  final String date;
+  final String arrivalTime;
   final String from;
   final String to;
+  final String date;
   final double price;
+  final List<int> seatreserved;
+  final String busId;
 
-  const SeatPlanPage({super.key, 
+  const SeatPlanPage({
+    super.key,
     required this.busNumber,
     required this.departureTime,
-    required this.date,
+    required this.arrivalTime,
     required this.from,
     required this.to,
+    required this.date,
     required this.price,
+    required this.seatreserved,
+    required this.busId,
   });
 
   @override
@@ -22,21 +31,76 @@ class SeatPlanPage extends StatefulWidget {
 }
 
 class _SeatPlanPageState extends State<SeatPlanPage> {
-  List<String> seats = List.generate(12, (index) => 'Available');
-  List<int> selectedSeats = [];
+  // Initialize a list to track the availability of seats
+  List<String> seats = List.generate(13, (index) => 'Available');
+  // Use ValueNotifier to track selected seat indices
+  ValueNotifier<List<int>> selectedSeatsNotifier = ValueNotifier<List<int>>([]);
 
-  void toggleSeat(int index) {
-    if (seats[index] == 'Available') {
-      setState(() {
-        seats[index] = 'Selected';
-        selectedSeats.add(index + 1); // Store seat number
-      });
-    } else if (seats[index] == 'Selected') {
-      setState(() {
-        seats[index] = 'Available';
-        selectedSeats.remove(index + 1); // Remove seat number
-      });
+  @override
+  void initState() {
+    super.initState();
+    // Mark reserved seats as 'Reserved'
+    for (var seat in widget.seatreserved) {
+      if (seat > 0 && seat <= seats.length) {
+        seats[seat - 1] = 'Reserved'; // Update seat status
+      }
     }
+  }
+
+  // Toggle the seat selection and update the seat state
+  void toggleSeat(int index) {
+    setState(() {
+      if (seats[index] == 'Available') {
+        // Mark seat as selected and add to the selectedSeatsNotifier list
+        seats[index] = 'Selected';
+        selectedSeatsNotifier.value = List.from(selectedSeatsNotifier.value)
+          ..add(index + 1); // Store seat number
+      } else if (seats[index] == 'Selected') {
+        // Mark seat as available and remove from the selectedSeatsNotifier list
+        seats[index] = 'Available';
+        selectedSeatsNotifier.value = List.from(selectedSeatsNotifier.value)
+          ..remove(index + 1); // Remove seat number
+      }
+      // Do nothing if the seat is reserved
+    });
+  }
+
+  @override
+  void dispose() {
+    // Dispose of ValueNotifier to avoid memory leaks
+    selectedSeatsNotifier.dispose();
+    super.dispose();
+  }
+
+  // Helper function to build a row of seats dynamically
+  Widget buildSeatRow(List<int> seatIndices) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: seatIndices.map((index) {
+          return GestureDetector(
+            onTap: () {
+              if (seats[index] == 'Available') {
+                toggleSeat(index); // Handle seat tap
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Icon(
+                Icons.event_seat,
+                size: 50,
+                // Change color based on seat state
+                color: seats[index] == 'Available'
+                    ? Colors.green
+                    : seats[index] == 'Selected'
+                        ? Colors.red
+                        : Colors.grey, // Color for reserved seats
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   @override
@@ -44,94 +108,167 @@ class _SeatPlanPageState extends State<SeatPlanPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Seat Plan'),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.teal,
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Board Point: ${widget.from} - ${widget.departureTime}\nDrop Point: ${widget.to} - 07:30',
-              style: const TextStyle(fontSize: 18),
+          // Bus details section
+          Card(
+            elevation: 0,
+            margin: const EdgeInsets.all(6.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const SizedBox(width: 20),
+                    Text(widget.from,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20)),
+                    const SizedBox(width: 170),
+                    const Icon(Icons.arrow_forward),
+                    const SizedBox(width: 150),
+                    Text(widget.to,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20)),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.departureTime,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 350),
+                    Text(
+                      widget.arrivalTime,
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ],
             ),
           ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-              ),
-              itemCount: 12,
-              itemBuilder: (context, index) {
-                Color seatColor;
-                if (seats[index] == 'Sold Out') {
-                  seatColor = Colors.red; // Sold Out
-                } else if (seats[index] == 'Selected') {
-                  seatColor = Colors.purple; // Selected
-                } else {
-                  seatColor = Colors.blue; // Available
-                }
+          const SizedBox(height: 20),
 
-                return GestureDetector(
-                  onTap: () {
-                    if (seats[index] != 'Sold Out') {
-                      toggleSeat(index);
-                    }
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: seatColor,
-                      borderRadius: BorderRadius.circular(8),
+          // Seat selection section
+          Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                const SizedBox(height: 40),
+                Row(
+                  children: [
+                    const SizedBox(width: 120),
+                    Image.asset(
+                      'assets/img/stering.jpeg',
+                      width: 50,
+                      height: 50,
                     ),
-                    child: Center(
-                      child: Text(
-                        (index + 1).toString(),
-                        style: const TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                    ),
-                  ),
-                );
-              },
+                  ],
+                ),
+                const SizedBox(height: 40),
+                Row(
+                  children: [
+                    const SizedBox(width: 50),
+                    buildSeatRow([0, 1]),
+                    const SizedBox(width: 0),
+                    buildSeatRow([9]),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const SizedBox(width: 50),
+                    buildSeatRow([2, 3]),
+                    const SizedBox(width: 0),
+                    buildSeatRow([10]),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const SizedBox(width: 50),
+                    buildSeatRow([4, 5]),
+                    const SizedBox(width: 0),
+                    buildSeatRow([11]),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const SizedBox(width: 50),
+                    buildSeatRow([6, 7]),
+                    const SizedBox(width: 0),
+                    buildSeatRow([12]),
+                  ],
+                ),
+              ],
             ),
           ),
+
+          // Selected seats and confirm booking button
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Text('Selected Seats: ${selectedSeats.join(', ')}'),
-                Text('Total Price: Bir ${widget.price * selectedSeats.length}'),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    // Handle booking confirmation logic here
-                    if (selectedSeats.isNotEmpty) {
-                      // Proceed with booking
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Booking Confirmed'),
-                          content: Text(
-                              'You have booked seats: ${selectedSeats.join(', ')}'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text('OK'),
-                            ),
-                          ],
-                        ),
-                      );
-                    } else {
-                      // Show a message if no seats are selected
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Please select at least one seat.')),
-                      );
-                    }
+                ValueListenableBuilder<List<int>>(
+                  valueListenable: selectedSeatsNotifier,
+                  builder: (context, selectedSeats, child) {
+                    return Text(
+                      'Selected Seats: ${selectedSeats.isEmpty ? 'None' : selectedSeats.join(', ')}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
                   },
-                  child: const Text('Confirm Booking'),
+                ),
+                const SizedBox(height: 20),
+                ValueListenableBuilder<List<int>>(
+                  valueListenable: selectedSeatsNotifier,
+                  builder: (context, selectedSeats, child) {
+                    return ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 14),
+                        backgroundColor: Colors.teal,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onPressed: selectedSeats.isEmpty
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PaymentPage(
+                                      busNumber: widget.busNumber,
+                                      departureTime: widget.departureTime,
+                                      from: widget.from,
+                                      to: widget.to,
+                                      date: widget.date,
+                                      price: widget.price,
+                                      selectedSeats: selectedSeats,
+                                      busId: widget.busId),
+                                ),
+                              );
+                            },
+                      child: const Text(
+                        'Confirm Booking',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -141,4 +278,3 @@ class _SeatPlanPageState extends State<SeatPlanPage> {
     );
   }
 }
- 

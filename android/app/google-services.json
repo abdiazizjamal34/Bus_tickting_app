@@ -1,0 +1,118 @@
+{
+  "project_info": {
+    "project_number": "295901224317",
+    "project_id": "mybus-a6ff8",
+    "storage_bucket": "mybus-a6ff8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295901224317:android:d367c1a8662f4828e7c014",
+        "android_client_info": {
+          "package_name": "com.example.bus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295901224317-e4l7m79c3tkqab99k3j52gdg3b8sg0f5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTD8GQFgot9D_yMP9Rx9Au1HNqFcQ7dx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295901224317-e4l7m79c3tkqab99k3j52gdg3b8sg0f5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "295901224317-aks82mcqvut1tjmd9r3aukp4hq30fcq4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.busTicketingApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295901224317:android:59fea23874971a71e7c014",
+        "android_client_info": {
+          "package_name": "com.example.bus_ticketing_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295901224317-e4l7m79c3tkqab99k3j52gdg3b8sg0f5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTD8GQFgot9D_yMP9Rx9Au1HNqFcQ7dx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295901224317-e4l7m79c3tkqab99k3j52gdg3b8sg0f5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "295901224317-aks82mcqvut1tjmd9r3aukp4hq30fcq4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.busTicketingApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:295901224317:android:7333656940a5f78ae7c014",
+        "android_client_info": {
+          "package_name": "com.example.flutter_firbase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "295901224317-e4l7m79c3tkqab99k3j52gdg3b8sg0f5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTD8GQFgot9D_yMP9Rx9Au1HNqFcQ7dx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "295901224317-e4l7m79c3tkqab99k3j52gdg3b8sg0f5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "295901224317-aks82mcqvut1tjmd9r3aukp4hq30fcq4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.busTicketingApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
